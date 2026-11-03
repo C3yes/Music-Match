@@ -556,7 +556,16 @@ function applyJson(){
     saveT();renderTL();$('#gmsg').textContent=T.length+' tracks imported'}
   catch(e){alert('Invalid JSON: each question needs 4 options and a correctIndex (0-3).')}
 }
-function qrSvg(t){try{const q=qrcode(0,'M');q.addData(t);q.make();return q.createSvgTag(4,0)}catch(e){return esc(t)}}
+function qrSvg(t){
+  try {
+    const q = qrcode(0, 'M');
+    q.addData(t);
+    q.make();
+    return q.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+  } catch(e) {
+    return esc(t);
+  }
+}
 function qr(){$('#qr').innerHTML=qrSvg($('#url').value.trim())}
 function qrBig(){const u=$('#url').value.trim();$('#qrbig').innerHTML=qrSvg(u);$('#qru').textContent=u;$('#qro').hidden=false}
 function initHost(){
