@@ -1,7 +1,8 @@
 // Music Match - serveur (zéro dépendance). Local : node server.js  |  Render : démarre avec "node server.js"
 const http = require('http'), os = require('os'), crypto = require('crypto'), fs = require('fs'), path = require('path');
 const PORT = +process.env.PORT || 3000;
-const TOKEN = process.env.HOST_KEY || crypto.randomBytes(4).toString('hex');
+// Clé fixe par défaut pour éviter que la clé d'hôte ne change à chaque redémarrage de Render
+const TOKEN = process.env.HOST_KEY || '281abcc8';
 let game = { phase: 'lobby', q: 0, seq: 0 }, voteStart = 0, players = {}, answers = {}, ver = 1;
 
 function lan() {
@@ -22,9 +23,9 @@ http.createServer(async (req, res) => {
   const u = new URL(req.url, 'http://x');
   const isHost = u.searchParams.get('k') === TOKEN;
 
-  // Le client interroge ce point toutes les ~1 s ; réponse minimale si rien n'a changé.
+  // Le client interroge ce point fréquemment pour un affichage quasi-instantané.
   if (u.pathname === '/api/poll') {
-    const out = { v: ver, host: isHost };
+    const out = { v: ver, host: isHost, playerCount: Object.keys(players).length };
     if (+u.searchParams.get('v') !== ver) {
       out.game = game;
       if (isHost) { out.players = plist(); out.answers = answers; }
