@@ -2452,7 +2452,6 @@ const db={
     onSnapshot:cb=>on('game',d=>cb({data:()=>d}))})
 };
 const gref=()=>db.doc('game/state');
-(K&&location.hash!=='#play')?initHost():initPart();
 
 /* ---------- confetti ---------- */
 function confetti(){
@@ -2643,6 +2642,9 @@ document.addEventListener('click',async e=>{
   mine[G.q]={o:+b.dataset.i,t:Math.min(VOTE_MS,Date.now()-vt0)};screen('pDone');
   try{const r=await post('/api/answer',{q:G.q,o:mine[G.q].o});if(r.ok)mine[G.q].t=r.t;else{delete mine[G.q];alert('Too late: voting is closed.');render()}}catch(err){delete mine[G.q];alert('Connection lost, try again.');render()}
 });
+
+/* start (after all declarations) */
+(K&&location.hash!=='#play')?initHost():initPart();
 </script>
 </body>
 </html>
