@@ -572,9 +572,10 @@ function initHost(){
   $('#host').hidden=false;
   try{T=JSON.parse(localStorage.getItem('mm-t')||'[]').map(t=>({...t,file:null,url:'',audioUrl:t.audioUrl||'',owner:t.owner||'',genre:t.genre||'',title:t.title||'',start:t.start||0}));tid=T.reduce((m,t)=>Math.max(m,t.id||0),0)}catch(e){T=[]}
   renderTL();
-  $('#url').value=location.origin+'/';qr();
+  $('#url').value = 'https://music-match-ilob.onrender.com/';
+  qr();
   $('#qrb').onclick=qrBig;$('#qro').onclick=()=>$('#qro').hidden=true;
-  fetch('/api/info').then(r=>r.json()).then(i=>{$('#url').value=i.joinUrl;qr()}).catch(()=>{});$('#url').oninput=qr;
+  $('#url').oninput=qr;
   db.collection('players').onSnapshot(s=>{players=s.docs.map(d=>({id:d.id,...d.data()}));
     $('#pc').textContent=players.length+' player'+(players.length===1?'':'s')+' joined';
     $('#chips').innerHTML=players.map(p=>`<span class="chip">${esc(p.avatar||'')} ${esc(p.name||'')}</span>`).join('')});
