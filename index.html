@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Ultimate Music Match</title>
+<style>
+:root{color-scheme:dark;--bg:#0b0b10;--card:#181821;--card2:#22222e;--tx:#f4f4f8;--mut:#9a9ab0;--g:#1ed760;--c0:#e21b3c;--c1:#1368ce;--c2:#d89e00;--c3:#26890c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:radial-gradient(circle at 20% 0,#1b1233 0,var(--bg) 55%) fixed;color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+[hidden]{display:none!important}
+.wrap{max-width:1100px;margin:0 auto;padding:20px}
+h1{font-size:clamp(28px,5vw,52px);margin:.2em 0;text-align:center;background:linear-gradient(90deg,#1ed760,#7c5cff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.card{background:var(--card);border-radius:18px;padding:18px;margin:14px 0}
+.center{text-align:center}.mut{color:var(--mut)}
+button,input,textarea{font:inherit;color:inherit}
+.btn{background:var(--g);color:#04120a;border:0;border-radius:999px;padding:14px 28px;font-weight:700;font-size:18px;cursor:pointer;transition:transform .1s}
+.btn:hover{transform:scale(1.04)}.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn.alt{background:var(--card2);color:var(--tx)}
+input[type=text],input[type=url],textarea{width:100%;background:var(--card2);border:2px solid transparent;border-radius:12px;padding:12px;outline:0}
+input:focus,textarea:focus{border-color:var(--g)}
+textarea{min-height:140px;font:13px/1.4 ui-monospace,Menlo,monospace}
+#qr{display:inline-block;background:#fff;padding:12px;border-radius:14px;min-height:50px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px}
+.chip{background:var(--card2);border-radius:999px;padding:4px 12px;font-size:14px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.pill{background:var(--card2);border-radius:999px;padding:6px 16px;font-weight:700}
+.player{display:flex;align-items:center;gap:16px}
+.play{width:64px;height:64px;border-radius:50%;font-size:26px;padding:0}
+.bar{flex:1;height:10px;background:var(--card2);border-radius:9px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--g)}
+.bar.t i{background:#ff7a45}
+.q{font-size:clamp(24px,4vw,42px);font-weight:800;text-align:center;margin:18px 0}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{border-radius:16px;padding:22px 16px;font-size:clamp(18px,2.6vw,30px);font-weight:700;display:flex;gap:12px;align-items:center;border:0;color:#fff;text-align:left;position:relative;overflow:hidden}
+.opt.dim{opacity:.25}.opt.ok{outline:5px solid #fff}
+.opt small{position:absolute;right:14px;opacity:.9;font-size:16px}
+.c0{background:var(--c0)}.c1{background:var(--c1)}.c2{background:var(--c2)}.c3{background:var(--c3)}
+.lb{list-style:none;margin:0;padding:0}
+.lb li{display:flex;align-items:center;gap:12px;background:var(--card2);border-radius:14px;padding:10px 16px;margin:8px 0;font-size:20px;animation:in .4s both}
+.lb li b{margin-left:auto;color:var(--g)}
+.lb li:first-child{background:linear-gradient(90deg,#3a2f0b,var(--card2))}
+@keyframes in{from{opacity:0;transform:translateY(14px)}}
+details summary{cursor:pointer;font-weight:700}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0}
+#cf{position:fixed;inset:0;pointer-events:none;z-index:9}
+/* participant */
+#part .wrap{max-width:520px;min-height:100vh;display:flex;flex-direction:column;justify-content:center}
+.av{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:14px 0}
+.av button{font-size:30px;background:var(--card2);border:3px solid transparent;border-radius:14px;padding:6px;cursor:pointer}
+.av button.sel{border-color:var(--g)}
+.big{font-size:56px;text-align:center}
+.vbtn{width:100%;min-height:19vh;margin:7px 0;font-size:24px;justify-content:center}
+.vbtn:active{transform:scale(.97)}
+@media(max-width:700px){.opts{grid-template-columns:1fr}}
+.trk{background:var(--card2);border-radius:12px;padding:10px;margin:8px 0}
+.trk .r{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.trk .r input{flex:1;min-width:110px;padding:8px;background:var(--card)}
+.trk .n{font-weight:800;width:26px;color:var(--g)}
+.ib{background:var(--card);border:0;border-radius:8px;padding:7px 10px;cursor:pointer;color:var(--tx)}
+.ib:hover{background:#2e2e40}
+.trk .o{font-size:13px;margin-top:6px;color:var(--mut)}
+.ok2{color:var(--g);font-weight:700}.warn{color:#ffb454}
+</style>
+</head>
+<body>
+<canvas id="cf"></canvas>
+<div id="err" class="wrap center" hidden><h1>Oops</h1><p>Cannot reach the game server.</p></div>
+
+<!-- HOST -->
+<div id="host" class="wrap" hidden>
+  <section id="sLobby">
+    <h1>The Ultimate Music Match 🎧</h1>
+    <p class="center mut">Scan to join · Who Listens to What?</p>
+    <div class="center"><div id="qr"></div></div>
+    <div class="center" style="margin-top:8px"><input id="url" type="url" style="max-width:520px" aria-label="Join link"></div>
+    <div class="center card"><b id="pc">0 players</b><div class="chips" id="chips"></div></div>
+    <details class="card" open><summary>🎵 Tracks &amp; whose favorite song it is</summary>
+      <div class="row"><label class="btn alt">➕ Add MP3 files<input id="mp3" type="file" accept="audio/*" multiple hidden></label><button class="btn alt" id="rebuild">🔀 Generate options (2-3 of the same style)</button><span id="gmsg" class="mut"></span></div>
+      <p class="mut">For each track: title, <b>favorite of…</b>, music style and the second to start from (the game plays a 20 s excerpt). Options are built so that 2 or 3 of the 4 names share the correct style. ▶ preview · ↑↓ reorder · 📁 replace file · 🎲 new options · 🗑 delete.</p>
+      <input id="swap" type="file" accept="audio/*" hidden>
+      <div id="tl"></div><datalist id="gl"></datalist>
+    </details>
+    <details class="card"><summary>🧾 Questions JSON (advanced)</summary>
+      <p class="mut">Format <code>{ id, audioUrl, correctIndex, options[4] }</code> plus optional <code>title, owner, genre, start</code>. Filled when you press Start; edit and apply to import.</p>
+      <textarea id="json" spellcheck="false"></textarea>
+      <div class="row"><button class="btn alt" id="applyJson">Apply JSON</button></div>
+    </details>
+    <div class="center"><button class="btn" id="start">▶ Start Game</button></div>
+  </section>
+
+  <section id="sGame" hidden>
+    <div class="top"><span class="pill" id="trk"></span><span class="pill" id="ans"></span><span class="pill" id="cd">30</span></div>
+    <div class="card player">
+      <button class="btn play" id="pp" aria-label="Play">▶</button>
+      <div style="flex:1"><div class="bar"><i id="ab"></i></div><div class="mut" style="margin-top:6px">Audio: 20 s excerpt</div></div>
+    </div>
+    <div class="bar t"><i id="tb"></i></div>
+    <div class="q">Whose favorite song is this?</div>
+    <div class="opts" id="opts"></div>
+    <div class="q" id="who" hidden></div>
+    <div class="center" style="margin-top:18px"><button class="btn" id="reveal">Show Results &amp; Leaderboard</button> <button class="btn alt" id="next" hidden>Next Track ➜</button></div>
+    <div class="card" id="lbc" hidden><h2 class="center" style="margin-top:0">🏆 Top 5</h2><ol class="lb" id="lb"></ol></div>
+  </section>
+
+  <section id="sFinal" hidden>
+    <h1>🎉 Final Results 🎉</h1>
+    <div class="card"><ol class="lb" id="flb"></ol></div>
+    <div class="center"><button class="btn alt" id="again">Back to lobby</button></div>
+  </section>
+</div>
+
+<!-- PARTICIPANT -->
+<div id="part" hidden><div class="wrap">
+  <div id="pJoin">
+    <h1 style="font-size:34px">Music Match 🎧</h1>
+    <input id="nm" type="text" maxlength="24" placeholder="Your name or team name" aria-label="Name">
+    <div class="av" id="av"></div>
+    <button class="btn" id="join" style="width:100%">Join the game</button>
+  </div>
+  <div id="pWait" class="center" hidden><div class="big" id="wav">🎧</div><h2 id="wtx">Waiting for the host…</h2></div>
+  <div id="pVote" hidden><div class="top"><span class="pill" id="vt"></span><span class="pill" id="vc">30</span></div><div id="vb" style="margin-top:12px"></div></div>
+  <div id="pDone" class="center" hidden><div class="big">✅</div><h2>Answer Submitted!</h2><p class="mut">Wait for the results…</p></div>
+  <div id="pRes" class="center" hidden><div class="big" id="re"></div><h2 id="rt"></h2><p id="rp" class="mut"></p></div>
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const SH=['▲','◆','●','■'],AV=['🦊','🐼','🐸','🦄','🐙','🦁','🐧','🐯','🐵','🦖','🐝','🦉'];
+const VOTE_MS=30000,AUDIO_S=20;
+let me,G={phase:'none'};
+const K=new URLSearchParams(location.search).get('k')||'';
+(()=>{let id;try{id=localStorage.getItem('mm-id')}catch(e){}
+  if(!id){id=Math.random().toString(36).slice(2,10)+Date.now().toString(36);try{localStorage.setItem('mm-id',id)}catch(e){}}me=id})();
+const post=(p,b)=>fetch(p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...b,id:me,k:K})}).then(r=>r.json());
+let es;
+function on(ev,cb){if(!es)es=new EventSource('/events?id='+encodeURIComponent(me)+'&k='+encodeURIComponent(K));es.addEventListener(ev,e=>cb(JSON.parse(e.data)))}
+const snap=l=>({docs:l.map(x=>({id:x.id,data:()=>x}))});
+const db={
+  collection:n=>({onSnapshot:cb=>on(n,d=>cb(snap(n==='players'?d:Object.entries(d).map(([id,v])=>({id,...v})))))}),
+  doc:p=>({
+    set:async d=>{if(p==='game/state')await post('/api/game',{state:d});else await post('/api/join',d)},
+    get:async()=>{const r=await(await fetch('/api/me?id='+encodeURIComponent(me))).json();window.__mine=r.a||{};return{exists:r.exists,data:()=>r}},
+    onSnapshot:cb=>on('game',d=>cb({data:()=>d}))})
+};
+const gref=()=>db.doc('game/state');
+(K&&location.hash!=='#play')?initHost():initPart();
+
+/* ---------- confetti ---------- */
+function confetti(){
+  const c=$('#cf'),x=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;
+  const P=Array.from({length:160},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height*.5,v:2+Math.random()*4,s:5+Math.random()*7,h:Math.random()*360,r:Math.random()*6}));
+  let f=0;(function d(){x.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.y+=p.v;p.x+=Math.sin(p.y/30);p.r+=.1;x.fillStyle=`hsl(${p.h},90%,60%)`;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillRect(0,0,p.s,p.s*.5);x.restore()});if(++f<260)requestAnimationFrame(d);else x.clearRect(0,0,c.width,c.height)})();
+}
+
+/* ---------- HOST ---------- */
+let T=[],Q=[],players=[],answers={},S={phase:'lobby',q:0,seq:0},t0=0,tick=0,closed=false,tid=0,st=0,swapIdx=0;
+const au=new Audio(),pv=new Audio();
+const saveT=()=>{try{localStorage.setItem('mm-t',JSON.stringify(T.map(t=>({id:t.id,fileName:t.fileName,audioUrl:t.audioUrl,title:t.title,owner:t.owner,genre:t.genre,start:t.start,opts:t.opts}))))}catch(e){}};
+const srcOf=t=>t.file?(t.url||(t.url=URL.createObjectURL(t.file))):(t.audioUrl||'');
+const gnorm=t=>(t.genre||'').trim().toLowerCase();
+const genreOf=n=>{const t=T.find(x=>x.owner.trim()===n);return t?gnorm(t):''};
+function buildOpts(t){
+  const o=t.owner.trim(),g=gnorm(t);
+  const names=[...new Set(T.map(x=>x.owner.trim()).filter(Boolean))].filter(n=>n!==o);
+  const same=shuffle(names.filter(n=>g&&genreOf(n)===g)),other=shuffle(names.filter(n=>!g||genreOf(n)!==g));
+  const k=Math.min(same.length,Math.random()<.5?1:2);
+  const pool=[...same.slice(0,k),...other,...same.slice(k)];
+  t.opts=shuffle([o,...pool.slice(0,3)]);
+}
+function optsHtml(t){
+  const src=srcOf(t)?'':`<span class="warn">⚠ no audio ${t.fileName?'— re-add '+esc(t.fileName):''}</span> `;
+  const nm=t.opts?t.opts.map(o=>{const g=genreOf(o);return `<span class="${o===t.owner.trim()?'ok2':''}">${esc(o)}${g?' ('+esc(g)+')':''}</span>`}).join(' · '):'<i>options not generated yet</i>';
+  return src+'Options: '+nm;
+}
+function refreshOpts(){document.querySelectorAll('#tl .trk').forEach(r=>{r.querySelector('.o').innerHTML=optsHtml(T[+r.dataset.i])});
+  $('#gl').innerHTML=[...new Set(T.map(t=>t.genre.trim()).filter(Boolean))].map(g=>`<option value="${esc(g)}">`).join('')}
+function renderTL(){
+  $('#tl').innerHTML=T.length?T.map((t,i)=>`<div class="trk" data-i="${i}"><div class="r"><span class="n">${i+1}</span>
+    <input type="text" data-f="title" placeholder="Title" value="${esc(t.title)}" aria-label="Title">
+    <input type="text" data-f="owner" placeholder="Favorite of…" value="${esc(t.owner)}" aria-label="Favorite of">
+    <input type="text" data-f="genre" list="gl" placeholder="Style" value="${esc(t.genre)}" aria-label="Style" style="max-width:130px">
+    <input type="text" inputmode="decimal" data-f="start" value="${t.start||0}" title="Start at (seconds)" aria-label="Start second" style="max-width:60px">
+    <button class="ib" data-a="play" title="Preview">▶</button><button class="ib" data-a="up">↑</button><button class="ib" data-a="down">↓</button><button class="ib" data-a="swap" title="Replace file">📁</button><button class="ib" data-a="roll" title="New options">🎲</button><button class="ib" data-a="del" title="Delete">🗑</button>
+    </div><div class="o"></div></div>`).join(''):'<p class="mut">No tracks yet: add your MP3 files.</p>';
+  refreshOpts();
+}
+function addFiles(list){
+  [...list].sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true})).forEach(f=>{
+    const m=T.find(t=>!t.file&&t.fileName===f.name);
+    if(m){m.file=f;m.url=''}else T.push({id:++tid,file:f,fileName:f.name,audioUrl:'',title:f.name.replace(/\.[^.]+$/,'').replace(/^\d+[\s._-]+/,''),owner:'',genre:'',start:0,opts:null})});
+  saveT();renderTL();
+}
+function preview(t){const s=srcOf(t);if(!s)return alert('No audio for this track.');
+  if(pv.src===s&&!pv.paused){pv.pause();return}pv.src=s;pv.currentTime=+t.start||0;pv.play().catch(()=>{})}
+function rebuildAll(){
+  let look=0,miss=0;
+  T.forEach(t=>{if(!t.owner.trim()){miss++;t.opts=null;return}buildOpts(t);const g=gnorm(t);if(g&&t.opts.filter(o=>genreOf(o)===g).length>1)look++});
+  saveT();refreshOpts();
+  $('#gmsg').textContent=look+'/'+T.length+' tracks with same-style decoys'+(miss?' · '+miss+' without a name':'');
+}
+function buildQ(){
+  if(!T.length||T.some(t=>!t.owner.trim())){alert('Every track needs a "Favorite of…" name.');return false}
+  if(new Set(T.map(t=>t.owner.trim())).size<4){alert('You need at least 4 different names.');return false}
+  if(T.some(t=>!srcOf(t))&&!confirm('Some tracks have no audio. Start anyway?'))return false;
+  T.forEach(t=>{t.owner=t.owner.trim();if(!t.opts||t.opts.length!==4||!t.opts.includes(t.owner))buildOpts(t)});
+  Q=T.map((t,i)=>({id:i+1,audioUrl:t.audioUrl||'',title:t.title,owner:t.owner,genre:t.genre,start:+t.start||0,options:t.opts,correctIndex:t.opts.indexOf(t.owner)}));
+  saveT();$('#json').value=JSON.stringify(Q,null,1);return true;
+}
+function applyJson(){
+  try{const a=JSON.parse($('#json').value);if(!Array.isArray(a))throw 0;
+    a.forEach(q=>{if(!Array.isArray(q.options)||q.options.length!==4||!(q.correctIndex>=0&&q.correctIndex<4))throw 0});
+    T=a.map((q,i)=>({id:++tid,file:T[i]?T[i].file:null,url:T[i]?T[i].url:'',fileName:T[i]?T[i].fileName:'',audioUrl:q.audioUrl||'',title:q.title||'',owner:q.owner||q.options[q.correctIndex],genre:q.genre||'',start:q.start||0,opts:q.options}));
+    saveT();renderTL();$('#gmsg').textContent=T.length+' tracks imported'}
+  catch(e){alert('Invalid JSON: each question needs 4 options and a correctIndex (0-3).')}
+}
+function qr(){
+  let u=$('#url').value.trim();$('#qr').innerHTML='';
+  try{new QRCode($('#qr'),{text:u,width:220,height:220})}catch(e){$('#qr').textContent=u}
+}
+function initHost(){
+  $('#host').hidden=false;
+  try{T=JSON.parse(localStorage.getItem('mm-t')||'[]').map(t=>({...t,file:null,url:'',audioUrl:t.audioUrl||'',owner:t.owner||'',genre:t.genre||'',title:t.title||'',start:t.start||0}));tid=T.reduce((m,t)=>Math.max(m,t.id||0),0)}catch(e){T=[]}
+  renderTL();
+  fetch('/api/info').then(r=>r.json()).then(i=>{$('#url').value=i.joinUrl;qr()}).catch(()=>{});$('#url').oninput=qr;
+  db.collection('players').onSnapshot(s=>{players=s.docs.map(d=>({id:d.id,...d.data()}));
+    $('#pc').textContent=players.length+' player'+(players.length===1?'':'s')+' joined';
+    $('#chips').innerHTML=players.map(p=>`<span class="chip">${esc(p.avatar||'')} ${esc(p.name||'')}</span>`).join('')});
+  db.collection('answers').onSnapshot(s=>{answers={};s.docs.forEach(d=>answers[d.id]=d.data());
+    if(S.phase==='vote'||S.phase==='closed')$('#ans').textContent=answered()+'/'+players.length+' answered'});
+  gref().set(S).catch(()=>{});
+  $('#mp3').onchange=e=>{addFiles(e.target.files);e.target.value=''};
+  $('#swap').onchange=e=>{const f=e.target.files[0];if(f&&T[swapIdx]){T[swapIdx].file=f;T[swapIdx].url='';T[swapIdx].fileName=f.name;saveT();renderTL()}e.target.value=''};
+  $('#tl').onchange=e=>{const el=e.target,r=el.closest('.trk');if(!r||!el.dataset.f)return;const t=T[+r.dataset.i],f=el.dataset.f;
+    let v=el.value.trim();if(f==='start'){v=Math.max(0,parseFloat(v.replace(',','.'))||0);el.value=v}
+    t[f]=v;if(f==='owner'||f==='genre')T.forEach(x=>x.opts=null);saveT();refreshOpts()};
+  $('#tl').onclick=e=>{const b=e.target.closest('button');if(!b)return;const i=+b.closest('.trk').dataset.i,t=T[i],a=b.dataset.a;
+    if(a==='del'){if(confirm('Delete track '+(i+1)+' ('+(t.title||t.fileName||'untitled')+')?')){T.splice(i,1);saveT();renderTL()}}
+    else if((a==='up'&&i>0)||(a==='down'&&i<T.length-1)){const j=a==='up'?i-1:i+1;[T[i],T[j]]=[T[j],T[i]];saveT();renderTL()}
+    else if(a==='play')preview(t);
+    else if(a==='swap'){swapIdx=i;$('#swap').click()}
+    else if(a==='roll'){if(!t.owner.trim())return alert('Enter the name first.');buildOpts(t);saveT();refreshOpts()}};
+  $('#applyJson').onclick=applyJson;$('#rebuild').onclick=rebuildAll;
+  $('#start').onclick=()=>{pv.pause();if(!buildQ())return;S.q=0;showQ()};
+  $('#pp').onclick=playPause;$('#reveal').onclick=reveal;$('#next').onclick=next;
+  $('#again').onclick=async()=>{au.pause();S={phase:'lobby',q:0,seq:S.seq+1};await gref().set(S);show('sLobby')};
+}
+function show(id){['sLobby','sGame','sFinal'].forEach(s=>$('#'+s).hidden=s!==id)}
+function answered(){return players.filter(p=>answers[p.id]&&answers[p.id].a&&answers[p.id].a[S.q]).length}
+async function pub(x){Object.assign(S,x);S.seq++;try{await gref().set(S)}catch(e){console.error(e)}}
+async function showQ(){
+  clearInterval(tick);au.pause();const q=Q[S.q];
+  au.src=srcOf(T[S.q])||q.audioUrl||'';st=q.start||0;
+  show('sGame');$('#trk').textContent='Track '+(S.q+1)+'/'+Q.length;$('#ans').textContent='';$('#cd').textContent='30';
+  $('#ab').style.width='0';$('#tb').style.width='0';$('#pp').textContent='▶';$('#pp').disabled=false;$('#who').hidden=true;
+  $('#reveal').hidden=false;$('#reveal').disabled=true;$('#next').hidden=true;$('#lbc').hidden=true;
+  $('#opts').innerHTML=q.options.map((o,i)=>`<div class="opt c${i}"><span>${SH[i]}</span>${esc(o)}<small></small></div>`).join('');
+  await pub({phase:'ready',total:Q.length,options:q.options,correct:-1,board:[],dist:[],who:''});
+}
+function playPause(){
+  if(S.phase==='ready'){
+    t0=Date.now();closed=false;au.currentTime=st;au.play().catch(()=>{});$('#pp').textContent='⏸';$('#reveal').disabled=false;
+    pub({phase:'vote'});clearInterval(tick);tick=setInterval(onTick,100);return;
+  }
+  if(au.paused&&Date.now()-t0<AUDIO_S*1000){au.play().catch(()=>{});$('#pp').textContent='⏸'}else{au.pause();$('#pp').textContent='▶'}
+}
+function onTick(){
+  const e=(Date.now()-t0)/1000,ae=au.src&&!au.paused?au.currentTime-st:Math.min(e,AUDIO_S);
+  $('#cd').textContent=Math.max(0,Math.ceil(VOTE_MS/1000-e));
+  $('#tb').style.width=Math.min(100,e/30*100)+'%';
+  $('#ab').style.width=Math.min(100,Math.max(0,ae)/AUDIO_S*100)+'%';
+  if(e>=AUDIO_S&&!au.paused){au.pause();$('#pp').textContent='▶';$('#pp').disabled=true}
+  if(e>=30&&!closed){closed=true;clearInterval(tick);pub({phase:'closed'})}
+}
+function boardNow(){
+  return players.map(p=>{let s=0;const a=(answers[p.id]||{}).a||{};
+    for(let i=0;i<=S.q;i++){const r=a[i];if(r&&r.o===Q[i].correctIndex)s+=500+Math.round(500*Math.max(0,1-r.t/VOTE_MS))}
+    return{id:p.id,name:p.name||'?',avatar:p.avatar||'🎧',score:s}}).sort((a,b)=>b.score-a.score);
+}
+function lbHtml(list){return list.map((p,i)=>`<li style="animation-delay:${i*.08}s"><span>${['🥇','🥈','🥉'][i]||i+1+'.'}</span><span>${esc(p.avatar)}</span>${esc(p.name)}<b>${p.score}</b></li>`).join('')}
+async function reveal(){
+  clearInterval(tick);au.pause();closed=true;await new Promise(r=>setTimeout(r,400));
+  const q=Q[S.q],dist=[0,0,0,0];
+  players.forEach(p=>{const r=((answers[p.id]||{}).a||{})[S.q];if(r)dist[r.o]++});
+  const board=boardNow();
+  document.querySelectorAll('.opt').forEach((el,i)=>{el.classList.toggle('ok',i===q.correctIndex);el.classList.toggle('dim',i!==q.correctIndex);el.querySelector('small').textContent=dist[i]+' vote'+(dist[i]===1?'':'s')});
+  $('#who').innerHTML='🎯 Favorite of <b>'+esc(q.owner)+'</b>'+(q.genre?' · '+esc(q.genre):'')+(q.title?'<br><small class="mut">🎵 '+esc(q.title)+'</small>':'');$('#who').hidden=false;
+  $('#lb').innerHTML=lbHtml(board.slice(0,5));$('#lbc').hidden=false;
+  $('#reveal').hidden=true;$('#next').hidden=false;$('#next').textContent=S.q+1>=Q.length?'Final Results 🏁':'Next Track ➜';
+  await pub({phase:'reveal',correct:q.correctIndex,dist,board,who:q.owner});
+}
+async function next(){
+  if(S.q+1>=Q.length){const board=boardNow();show('sFinal');$('#flb').innerHTML=lbHtml(board.slice(0,5));confetti();await pub({phase:'final',board});return}
+  S.q++;showQ();
+}
+
+/* ---------- PARTICIPANT ---------- */
+let joined=false,mine={},av=AV[0],tv=0,vt0=0,seenSeq=-1;
+function screen(id){['pJoin','pWait','pVote','pDone','pRes'].forEach(s=>$('#'+s).hidden=s!==id)}
+async function initPart(){
+  $('#part').hidden=false;
+  $('#av').innerHTML=AV.map((a,i)=>`<button type="button" data-a="${a}" class="${i?'':'sel'}">${a}</button>`).join('');
+  $('#av').onclick=e=>{const b=e.target.closest('button');if(!b)return;av=b.dataset.a;[...$('#av').children].forEach(x=>x.classList.toggle('sel',x===b))};
+  try{const p=await db.doc('players/'+me).get();if(p.exists){av=p.data().avatar;$('#nm').value=p.data().name;joined=true;mine=window.__mine||{}}}catch(e){}
+  $('#join').onclick=async()=>{const n=$('#nm').value.trim();if(!n)return $('#nm').focus();
+    try{await db.doc('players/'+me).set({name:n,avatar:av});joined=true;render()}catch(e){alert('Could not reach the game. Check that you are on the same Wi-Fi as the host.')}};
+  gref().onSnapshot(s=>{const d=s.data();if(d){G=d;render()}});
+  render();
+}
+function wait(t,e){screen('pWait');$('#wtx').textContent=t;$('#wav').textContent=e||av}
+function render(){
+  if(!joined)return screen('pJoin');
+  const p=G.phase;
+  if(p==='vote'){
+    if(seenSeq!==G.q+':v'){seenSeq=G.q+':v';vt0=Date.now();clearInterval(tv);
+      if(!mine[G.q]){screen('pVote');$('#vt').textContent='Track '+(G.q+1)+'/'+G.total;
+        $('#vb').innerHTML=G.options.map((o,i)=>`<button class="opt vbtn c${i}" data-i="${i}"><span>${SH[i]}</span>${esc(o)}</button>`).join('')}
+      tv=setInterval(()=>{const r=Math.max(0,Math.ceil((VOTE_MS-(Date.now()-vt0))/1000));$('#vc').textContent=r;if(!r)clearInterval(tv)},250)}
+    else if(mine[G.q])screen('pDone');
+    return}
+  if(p==='closed')return mine[G.q]?screen('pDone'):wait("Time's up ⏱","😴");
+  if(p==='reveal'){const r=mine[G.q];screen('pRes');
+    const ok=r&&r.o===G.correct,pts=ok?500+Math.round(500*Math.max(0,1-r.t/VOTE_MS)):0;
+    const rank=(G.board||[]).findIndex(x=>x.id===me)+1;
+    $('#re').textContent=!r?'😴':ok?'🎉':'❌';$('#rt').textContent=!r?'No answer':ok?'Correct!':'Not this time';
+    $('#rp').textContent='+'+pts+' pts'+(rank?' · Rank #'+rank+' of '+G.board.length:'')+(G.who?' · Favorite of '+G.who:'');return}
+  if(p==='final'){const rank=(G.board||[]).findIndex(x=>x.id===me)+1,sc=(G.board||[])[rank-1];screen('pRes');
+    $('#re').textContent=rank===1?'🏆':'🎊';$('#rt').textContent='Game over — you finished #'+(rank||'?');$('#rp').textContent=sc?sc.score+' pts':'';if(rank&&rank<=3)confetti();return}
+  if(p==='ready')return wait('Track '+(G.q+1)+' — get ready!','🎧');
+  wait('Waiting for the host…');
+}
+document.addEventListener('click',async e=>{
+  const b=e.target.closest('.vbtn');if(!b||G.phase!=='vote'||mine[G.q])return;
+  mine[G.q]={o:+b.dataset.i,t:Math.min(VOTE_MS,Date.now()-vt0)};screen('pDone');
+  try{const r=await post('/api/answer',{q:G.q,o:mine[G.q].o});if(r.ok)mine[G.q].t=r.t;else{delete mine[G.q];alert('Too late: voting is closed.');render()}}catch(err){delete mine[G.q];alert('Connection lost, try again.');render()}
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "name": "music-match",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The Ultimate Music Match - blind test pour team building",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" }
+}
