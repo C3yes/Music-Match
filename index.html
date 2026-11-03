@@ -311,7 +311,7 @@ var qrcode = function() {
       makeImpl(false, getBestMaskPattern());
     };
     _this.createSvgTag = function(cellSize, margin) {
-      cellSize = cellSize || 2; margin = (typeof margin == 'undefined') ? cellSize * 4 : margin;
+      cellSize = cellSize || 4; margin = (typeof margin == 'undefined') ? 0 : margin;
       var size = _this.getModuleCount() * cellSize + margin * 2;
       var qrSvg = '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + size + ' ' + size + '" preserveAspectRatio="xMinYMin meet">';
       qrSvg += '<rect width="100%" height="100%" fill="white" cx="0" cy="0"/><path d="';
@@ -561,7 +561,7 @@ function qrSvg(t){
     const q = qrcode(0, 'M');
     q.addData(t);
     q.make();
-    return q.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+    return q.createSvgTag(4, 0);
   } catch(e) {
     return esc(t);
   }
